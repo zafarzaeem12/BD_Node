@@ -76,9 +76,6 @@ const LoginRegisteredUser = async (req, res, next) => {
         process.env.SECRET_KEY,
         { expiresIn: "1h" }
       );
-
-      console.log("kkk", token);
-
       const save_token = await User.findByIdAndUpdate(
         { _id: LoginUser?._id?.toString() },
         { $set: { user_authentication: `${token}` } },
