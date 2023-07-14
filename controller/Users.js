@@ -34,6 +34,9 @@ const Register_New_User = async (req, res) => {
         user_image: userAvator,
         phone_number: req.body.phone_number,
         dob: db,
+        user_device_token : req.body.user_device_token || "asdfghjkl",
+        user_device_type : req.body.user_device_type || 'android'
+    
       });
       const Register = await newUser.save();
 
@@ -55,7 +58,11 @@ const LoginRegisteredUser = async (req, res, next) => {
   try {
     const email = req.body.email;
     const password = req.body.password;
-    const LoginUser = await User.findOne({ email: email });
+    const user_device_token = req.body.user_device_token || "asdfghjkl"
+    const user_device_type = req.body.user_device_type || 'android'
+
+    const LoginUser = await 
+    User.findOne({ email: email , user_device_token : user_device_token , user_device_type : user_device_type });
     const gen_password = CryptoJS.AES.decrypt(
       LoginUser?.password,
       process.env.SECRET_KEY
@@ -184,10 +191,10 @@ const User_Forget_Password = async (req, res, next) => {
         code: 404,
       });
       next();
-    } else if (userfind.email) {
+    } else if (userfind?.email) {
       const num = Math.floor(Math.random() * 9000) + 1000;
       const nums = await User.findOneAndUpdate(
-        userfind.email,
+        userfind?.email && userfind?._id ,
         {
           $set: {
             verification_code: num,
@@ -254,7 +261,7 @@ const User_Reset_Password = async (req, res, next) => {
 
     if (typed_password != original_password) {
       const users = await User.findOneAndUpdate(
-        data?.email,
+        data?.email && data?._id,
         {
           $set: {
             password: CryptoJS.AES.encrypt(

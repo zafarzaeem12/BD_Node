@@ -54,9 +54,12 @@ const UserSchema = new mongoose.Schema({
     },
     user_device_token: {
         type: String,
+        required : true
     },
     user_device_type: {
         type: String,
+        required : true
+        
     },
     is_profile_deleted :{
         type: Boolean,
