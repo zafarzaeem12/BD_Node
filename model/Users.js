@@ -16,8 +16,8 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     user_image: {
-        type: String,
-        required: true
+        type: Array,
+         required: true
     },
     phone_number: {
         type: String,
@@ -45,6 +45,7 @@ const UserSchema = new mongoose.Schema({
     },
     user_authentication: {
         type: String,
+        default : ""
     },
     user_social_token: {
         type: String,

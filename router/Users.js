@@ -15,7 +15,7 @@ const {
 router.post('/create_new_User' , File.upload , Register_New_User);
 router.post('/login' , LoginRegisteredUser);
 router.get('/profile' ,auth ,VerifyRegisteredUser );
-router.put('/update',auth , Update_Existing_User );
+router.put('/update',auth ,File.upload , Update_Existing_User );
 router.delete('/delete',auth , Delete_Existing_User );
 router.post('/forget_password' , User_Forget_Password );
 router.post('/otp_verify' , OTP_Verification);

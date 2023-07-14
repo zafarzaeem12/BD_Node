@@ -1,32 +1,33 @@
 const User = require('../model/Users')
 const CryptoJS = require('crypto-js');
 const jwt = require('jsonwebtoken');
+const moment = require('moment');
 
 const Register_New_User = async (req,res) => {
-    console.log('object')
-    // const userAvator =  req?.files?.user_image?.map((data) => data?.path?.replace(/\\/g, "/"))
-    // try{
-    //     const newUser = new User({
-    //         name : req.body.name ,
-    //         email : req.body.email,
-    //         password : CryptoJS.AES.encrypt(req.body.password, process.env.SECRET_KEY).toString(),
-    //         user_image : userAvator,
-    //         phone_number : req.body.phone_number,
-    //         dob : req.body.dob
-    //     })
-    //     console.log('Register',Register)
-    //     const Register = await newUser.save();
-    //     res.send({
-    //         message:`New User ${Register?.name} created Successfully`,
-    //         status:201,
-    //         data: Register
-    //     })
-    // }catch(err){
-    //     res.send({
-    //         message:`No User Created`,
-    //         status:404
-    //     })
-    // }
+    try{
+        const userAvator =  req?.files?.user_image?.map((data) => data?.path?.replace(/\\/g, "/"))
+        const db = moment(req.body.dob, 'YYYY-MM-DD').toDate()
+        const newUser = new User({
+            name : req.body.name ,
+            email : req.body.email,
+            password : CryptoJS.AES.encrypt(req.body.password, process.env.SECRET_KEY).toString(),
+            user_image : userAvator,
+            phone_number : req.body.phone_number,
+            dob : db
+        })
+       const Register = await newUser.save();
+     
+        res.send({
+            message:`New User ${Register?.name} created Successfully`,
+            status:201,
+            data: Register
+        })
+    }catch(err){
+        res.send({
+            message:err.message,
+            status:404
+        })
+    }
 }
 
 const LoginRegisteredUser = async (req,res,next) => {
@@ -45,10 +46,16 @@ const LoginRegisteredUser = async (req,res,next) => {
           const token =  jwt.sign({
                 id : LoginUser._id
             }, process.env.SECRET_KEY , { expiresIn: '1h' } )
+
+          console.log( "kkk" ,token)
+
+          const save_token = await User.findByIdAndUpdate( { _id :LoginUser?._id?.toString()} , { $set :{user_authentication : `${token}`} } , {new : true})
+        const { user_authentication } = save_token
+          
             res.send({
                  message:"Login Successful",
                  status:200,
-                 data:{ token}
+                 data:{ user_authentication}
                 })
         }
     }catch(err){
@@ -60,9 +67,12 @@ const LoginRegisteredUser = async (req,res,next) => {
 
 }
 
+
 const VerifyRegisteredUser = async (req,res) => {
     try{
+       
         const Id =  req.id
+
         const verified_User = await User.findById(Id);
         const { password  , ...details } = verified_User._doc
         res.send({
@@ -79,21 +89,24 @@ const VerifyRegisteredUser = async (req,res) => {
 }
 
 const Update_Existing_User = async (req,res,next) => {
+    const userAvator =  req?.files?.user_image?.map((data) => data?.path?.replace(/\\/g, "/"))
+    const db = moment(req.body.dob, 'YYYY-MM-DD').toDate()
     const Id = req.id;
     try{
         const Update_user = await User.findByIdAndUpdate(
             { _id : Id },
             {
                 $set:{
-                    name : req.body.name,
-                    username : req.body.username,
-                    contact_no : req.body.contact_no,
-                    country : req.body.country
+                    name :  req.body.name,
+                    phone_number : req.body.phone_number,
+                    dob : db,
+                    user_image : userAvator
                 }
             },
             { new : true}
         )
         const { password , ...others  } = Update_user._doc
+       
         res.send({
             message: `User Updated Successfully`,
             data : 204,

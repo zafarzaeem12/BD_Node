@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
     }
   },
   filename: function (req, file, cb) {
-    if (file.fieldname === "avatar") {
+    if (file.fieldname === "user_image") {
       const filename = file.originalname.split(" ").join("-");
       cb(null, `${filename}`);
     } else if (file.fieldname === "category_image") {
