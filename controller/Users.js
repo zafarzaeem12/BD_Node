@@ -3,8 +3,6 @@ const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 
-// Remaining points validation remaining still ?
-
 const Register_New_User = async (req, res) => {
   const typed_Email = req.body.email;
   const typed_phone_number = req.body.phone_number;
