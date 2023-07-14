@@ -131,6 +131,7 @@ const Update_Existing_User = async (req, res, next) => {
           phone_number: req.body.phone_number,
           dob: db,
           user_image: userAvator,
+          user_is_profile_complete : true
         },
       },
       { new: true }
@@ -145,8 +146,7 @@ const Update_Existing_User = async (req, res, next) => {
   } catch (err) {
     res.send({
       message: `No User Updated`,
-      data: 200,
-      data: Update_user,
+      status : 404
     });
   }
 };
@@ -192,16 +192,17 @@ const User_Forget_Password = async (req, res, next) => {
         userfind.email,
         {
           $set: {
-            otp: num,
+            verification_code: num,
+            user_is_forgot : true
           },
         },
         { new: true }
       );
-      const { otp, email, ...others } = nums;
+      const { verification_code, email, ...others } = nums;
       res.send({
         message: "OTP generated",
         code: 201,
-        data: { otp, email },
+        data: { verification_code, email },
       });
     }
   } catch (err) {
@@ -214,15 +215,19 @@ const User_Forget_Password = async (req, res, next) => {
 
 const OTP_Verification = async (req, res, next) => {
   try {
-    const typed_OTP = req.query.otp;
+    const typed_OTP = req.query.verification_code;
     const typed_email = req.query.email;
     const data = await User.findOne({ email: typed_email });
-    if (typed_email == data?.email && typed_OTP == data?.otp) {
-      res.send({
-        message: "OTP verified",
-        status: 200,
-        data: { email: data?.email },
-      });
+    if (typed_email == data?.email && typed_OTP == data?.verification_code) {
+
+        const checked = await  User.updateOne( {_id : data?._id} , { is_verified : true } , {new : true } )
+        const { acknowledged , modifiedCount  } = checked
+        acknowledged === true && modifiedCount === 1 ? 
+            res.send({
+                message: "OTP verified",
+                status: 200,
+                data: { email: data?.email },
+            }) : null;
     } else {
       res.send({
         message: "OTP Not verified",
