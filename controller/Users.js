@@ -34,9 +34,8 @@ const Register_New_User = async (req, res) => {
         user_image: userAvator,
         phone_number: req.body.phone_number,
         dob: db,
-        user_device_token : req.body.user_device_token || "asdfghjkl",
-        user_device_type : req.body.user_device_type || 'android'
-    
+        user_device_token: req.body.user_device_token || "asdfghjkl",
+        user_device_type: req.body.user_device_type || "android",
       });
       const Register = await newUser.save();
 
@@ -58,11 +57,14 @@ const LoginRegisteredUser = async (req, res, next) => {
   try {
     const email = req.body.email;
     const password = req.body.password;
-    const user_device_token = req.body.user_device_token || "asdfghjkl"
-    const user_device_type = req.body.user_device_type || 'android'
+    const user_device_token = req.body.user_device_token || "asdfghjkl";
+    const user_device_type = req.body.user_device_type || "android";
 
-    const LoginUser = await 
-    User.findOne({ email: email , user_device_token : user_device_token , user_device_type : user_device_type });
+    const LoginUser = await User.findOne({
+      email: email,
+      user_device_token: user_device_token,
+      user_device_type: user_device_type,
+    });
     const gen_password = CryptoJS.AES.decrypt(
       LoginUser?.password,
       process.env.SECRET_KEY
@@ -136,7 +138,7 @@ const Update_Existing_User = async (req, res, next) => {
           phone_number: req.body.phone_number,
           dob: db,
           user_image: userAvator,
-          user_is_profile_complete : true
+          user_is_profile_complete: true,
         },
       },
       { new: true }
@@ -151,12 +153,12 @@ const Update_Existing_User = async (req, res, next) => {
   } catch (err) {
     res.send({
       message: `No User Updated`,
-      status : 404
+      status: 404,
     });
   }
 };
 
-const Delete_Existing_User = async (req, res, next) => {
+const Delete_Existing_User_Permanently = async (req, res, next) => {
   const Id = req.id;
   try {
     const deleteUser = await User.deleteOne({ _id: Id });
@@ -194,11 +196,11 @@ const User_Forget_Password = async (req, res, next) => {
     } else if (userfind?.email) {
       const num = Math.floor(Math.random() * 9000) + 1000;
       const nums = await User.findOneAndUpdate(
-        userfind?.email && userfind?._id ,
+        userfind?.email && userfind?._id,
         {
           $set: {
             verification_code: num,
-            user_is_forgot : true
+            user_is_forgot: true,
           },
         },
         { new: true }
@@ -224,15 +226,19 @@ const OTP_Verification = async (req, res, next) => {
     const typed_email = req.query.email;
     const data = await User.findOne({ email: typed_email });
     if (typed_email == data?.email && typed_OTP == data?.verification_code) {
-
-        const checked = await  User.updateOne( {_id : data?._id} , { is_verified : true } , {new : true } )
-        const { acknowledged , modifiedCount  } = checked
-        acknowledged === true && modifiedCount === 1 ? 
-            res.send({
-                message: "OTP verified",
-                status: 200,
-                data: { email: data?.email },
-            }) : null;
+      const checked = await User.updateOne(
+        { _id: data?._id },
+        { is_verified: true },
+        { new: true }
+      );
+      const { acknowledged, modifiedCount } = checked;
+      acknowledged === true && modifiedCount === 1
+        ? res.send({
+            message: "OTP verified",
+            status: 200,
+            data: { email: data?.email },
+          })
+        : null;
     } else {
       res.send({
         message: "OTP Not verified",
@@ -289,12 +295,48 @@ const User_Reset_Password = async (req, res, next) => {
   }
 };
 
+const Delete_Existing_User_Temporaray = async (req, res, next) => {
+  const email = req.query.email;
+  const is_Blocked = req.query.is_Blocked;
+  const is_profile_deleted = req.query.is_profile_deleted;
+  const Users = await User.findOne({ email: email });
+
+  if (is_Blocked) {
+    const reported_User = await User.findByIdAndUpdate(
+      { _id: Users._id },
+      { $set: { is_Blocked: is_Blocked } },
+      { new: true }
+    );
+    res.send({
+      message:
+        reported_User?.is_Blocked === true
+          ? `this user ${reported_User?.name} is Blocked successfully`
+          : `this user ${reported_User?.name} is Un_Blocked successfully`,
+      status: 201,
+    });
+  } else if (is_profile_deleted) {
+    const reported_User = await User.findByIdAndUpdate(
+      { _id: Users._id },
+      { $set: { is_profile_deleted: is_profile_deleted } },
+      { new: true }
+    );
+    res.send({
+      message:
+        reported_User?.is_profile_deleted === true
+          ? `this user ${reported_User?.name} is Deleted successfully`
+          : `this user ${reported_User?.name} is Restore successfully`,
+      status: 201,
+    });
+  }
+};
+
 module.exports = {
   Register_New_User,
   LoginRegisteredUser,
   VerifyRegisteredUser,
   Update_Existing_User,
-  Delete_Existing_User,
+  Delete_Existing_User_Permanently,
+  Delete_Existing_User_Temporaray,
   User_Forget_Password,
   OTP_Verification,
   User_Reset_Password,

@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../model/Users");
 const User_Token_Authentication = async (req, res, next) => {
   const token = req.headers["authorization"].split(" ")[1];
-  const auth = await User.findOne({ user_authentication: token });
+  const auth = await User.findOne({ user_authentication: token});
 
   if (!token) {
     return res.send({
@@ -11,6 +11,12 @@ const User_Token_Authentication = async (req, res, next) => {
     });
   } else if (auth?.user_authentication !== token) {
     return res.send({ message: "token is not matched", status: 400 });
+  }
+  else if (auth?.is_Blocked === true){
+    return res.send({ message: `Dear ${auth?.name} your account is temporaray blocked`, status: 400 });
+  }
+  else if (auth?.is_profile_deleted === true){
+    return res.send({ message: `Dear ${auth?.name} your account is temporaray Deleted`, status: 400 });
   }
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
