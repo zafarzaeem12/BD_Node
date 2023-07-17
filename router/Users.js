@@ -10,7 +10,7 @@ const {
     User_Forget_Password,
     OTP_Verification,
     User_Reset_Password,
-    Delete_Existing_User_Temporaray,
+    Delete_and_Blocked_Existing_User_Temporaray,
     Turn_on_or_off_Notifications
 } = require('../controller/Users')
 
@@ -19,7 +19,7 @@ router.post('/login' ,  File.upload ,LoginRegisteredUser);
 router.get('/profile' ,auth ,File.upload ,VerifyRegisteredUser );
 router.put('/update',auth ,File.upload , Update_Existing_User );
 router.delete('/delete',auth , File.upload  , Delete_Existing_User_Permanently );
-router.put('/softdelete' , Delete_Existing_User_Temporaray )
+router.put('/softdelete' , Delete_and_Blocked_Existing_User_Temporaray )
 router.post('/forget_password' , File.upload , User_Forget_Password );
 router.post('/otp_verify' , File.upload , OTP_Verification);
 router.post('/reset_password' , File.upload , User_Reset_Password)

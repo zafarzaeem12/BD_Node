@@ -295,7 +295,7 @@ const User_Reset_Password = async (req, res, next) => {
   }
 };
 
-const Delete_Existing_User_Temporaray = async (req, res, next) => {
+const Delete_and_Blocked_Existing_User_Temporaray = async (req, res, next) => {
   try {
     const email = req.query.email;
     const is_Blocked = req.query.is_Blocked;
@@ -370,7 +370,7 @@ module.exports = {
   VerifyRegisteredUser,
   Update_Existing_User,
   Delete_Existing_User_Permanently,
-  Delete_Existing_User_Temporaray,
+  Delete_and_Blocked_Existing_User_Temporaray,
   User_Forget_Password,
   OTP_Verification,
   User_Reset_Password,
