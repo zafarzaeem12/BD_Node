@@ -24,7 +24,7 @@ const Register_New_User = async (req, res) => {
         data?.path?.replace(/\\/g, "/")
       );
       const db = moment(req.body.dob, "YYYY-MM-DD").toDate();
-      const newUser = new User({
+      const newUser = {
         name: req.body.name,
         email: typed_Email,
         password: CryptoJS.AES.encrypt(
@@ -36,8 +36,8 @@ const Register_New_User = async (req, res) => {
         dob: db,
         user_device_token: req.body.user_device_token || "asdfghjkl",
         user_device_type: req.body.user_device_type || "android",
-      });
-      const Register = await newUser.save();
+      };
+      const Register = await User.create(newUser)
 
       res.send({
         message: `New User ${Register?.name} created Successfully`,
