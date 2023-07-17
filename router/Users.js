@@ -19,8 +19,8 @@ router.get('/profile' ,auth ,File.upload ,VerifyRegisteredUser );
 router.put('/update',auth ,File.upload , Update_Existing_User );
 router.delete('/delete',auth , File.upload  , Delete_Existing_User_Permanently );
 router.put('/softdelete' , Delete_Existing_User_Temporaray )
-router.post('/forget_password' , User_Forget_Password );
-router.post('/otp_verify' , OTP_Verification);
-router.post('/reset_password' , User_Reset_Password)
+router.post('/forget_password' , File.upload , User_Forget_Password );
+router.post('/otp_verify' , File.upload , OTP_Verification);
+router.post('/reset_password' , File.upload , User_Reset_Password)
 
 module.exports = router
