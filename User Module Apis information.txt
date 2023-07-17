@@ -1,0 +1,16 @@
+
+========================================================================  USER MODULE =============================================================================================
+
+1-Register User Api: http://localhost:3000/UserAPI/create_new_User  { email , name , password , user_image , phone_number , dob , user_device_token , user_device_type } = req.body
+2-Login User Api : http://localhost:3000/UserAPI/login              { email , password } = req.body
+3-Profile User Api : http://localhost:3000/UserAPI/profile        ---> token required
+4-Update User Api : http://localhost:3000/UserAPI/update          ---> token required
+5-Hard Delete User Api : http://localhost:3000/UserAPI/delete     ---> token required
+6-Hard Delete User Api : http://localhost:3000/UserAPI/softdelete?email=""&is_Blocked=Boolean || is_profile_deleted=Boolean
+7-Forget Password Api : http://localhost:3000/UserAPI/forget_password?email=" "
+8-OTP Verify Api : http://localhost:3000/UserAPI/otp_verify?email=" "&verification_code=" "
+9-Reset Passwaord Api : http://localhost:3000/UserAPI/reset_password?email=" " { password  }  = req.body
+10-Notification Toggling Api : http://localhost:3000/UserAPI/isnotify ---> token required
+11-Logout User Api :  http://localhost:3000/UserAPI/logout ---> token required
+
+========================================================================  USER MODULE =============================================================================================
