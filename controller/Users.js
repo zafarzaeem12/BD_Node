@@ -296,36 +296,70 @@ const User_Reset_Password = async (req, res, next) => {
 };
 
 const Delete_Existing_User_Temporaray = async (req, res, next) => {
-  const email = req.query.email;
-  const is_Blocked = req.query.is_Blocked;
-  const is_profile_deleted = req.query.is_profile_deleted;
-  const Users = await User.findOne({ email: email });
+  try {
+    const email = req.query.email;
+    const is_Blocked = req.query.is_Blocked;
+    const is_profile_deleted = req.query.is_profile_deleted;
+    const Users = await User.findOne({ email: email });
 
-  if (is_Blocked) {
+    if (is_Blocked) {
+      const reported_User = await User.findByIdAndUpdate(
+        { _id: Users._id },
+        { $set: { is_Blocked: is_Blocked } },
+        { new: true }
+      );
+      res.send({
+        message:
+          reported_User?.is_Blocked === true
+            ? `this user ${reported_User?.name} is Blocked successfully`
+            : `this user ${reported_User?.name} is Un_Blocked successfully`,
+        status: 201,
+      });
+    } else if (is_profile_deleted) {
+      const reported_User = await User.findByIdAndUpdate(
+        { _id: Users._id },
+        { $set: { is_profile_deleted: is_profile_deleted } },
+        { new: true }
+      );
+      res.send({
+        message:
+          reported_User?.is_profile_deleted === true
+            ? `this user ${reported_User?.name} is Deleted successfully`
+            : `this user ${reported_User?.name} is Restore successfully`,
+        status: 201,
+      });
+    }
+  } catch (err) {
+    res.send({
+      message: "Status Not Chnaged",
+      status: 404,
+    });
+  }
+};
+
+const Turn_on_or_off_Notifications = async (req, res, next) => {
+  const email = req.query.email;
+  const notification = req.query.is_notification;
+  try{
+    const Notify = await User.findOne({ email : email });
+
     const reported_User = await User.findByIdAndUpdate(
-      { _id: Users._id },
-      { $set: { is_Blocked: is_Blocked } },
+      { _id: Notify._id },
+      { $set: { is_notification: notification } },
       { new: true }
     );
     res.send({
       message:
-        reported_User?.is_Blocked === true
-          ? `this user ${reported_User?.name} is Blocked successfully`
-          : `this user ${reported_User?.name} is Un_Blocked successfully`,
+        reported_User?.is_notification === true
+          ? `this user ${reported_User?.name} has been Subscribed`
+          : `this user ${reported_User?.name} has been Un_Subscribed`,
       status: 201,
     });
-  } else if (is_profile_deleted) {
-    const reported_User = await User.findByIdAndUpdate(
-      { _id: Users._id },
-      { $set: { is_profile_deleted: is_profile_deleted } },
-      { new: true }
-    );
+
+  }catch(err){
     res.send({
-      message:
-        reported_User?.is_profile_deleted === true
-          ? `this user ${reported_User?.name} is Deleted successfully`
-          : `this user ${reported_User?.name} is Restore successfully`,
-      status: 201,
+      message: "Status Not Chnaged",
+      status: 404,
     });
   }
 };
@@ -340,4 +374,5 @@ module.exports = {
   User_Forget_Password,
   OTP_Verification,
   User_Reset_Password,
+  Turn_on_or_off_Notifications,
 };
