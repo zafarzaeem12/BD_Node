@@ -364,6 +364,30 @@ const Turn_on_or_off_Notifications = async (req, res, next) => {
   }
 };
 
+const Logout_Existing_User = async (req,res,next) => {
+  const ID = req.id
+  try{
+    const Empty_token = await User.findOne({ _id : ID });
+    const reported_User = await User.findByIdAndUpdate(
+      { _id: Empty_token._id },
+      { $set: { user_authentication: "" } },
+      { new: true }
+    );
+
+    res.send({
+      message : `${reported_User?.name} Logout Successfully`,
+      status : 204,
+
+    })
+
+  }catch(err){
+    res.send({
+      message: "Status Not Chnaged",
+      status: 404,
+    });
+  }
+}
+
 module.exports = {
   Register_New_User,
   LoginRegisteredUser,
@@ -375,4 +399,5 @@ module.exports = {
   OTP_Verification,
   User_Reset_Password,
   Turn_on_or_off_Notifications,
+  Logout_Existing_User
 };
